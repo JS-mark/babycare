@@ -8,6 +8,7 @@ import { VitePWA } from "vite-plugin-pwa";
 const commitHash = execSync("git rev-parse --short HEAD").toString().trim();
 
 export default defineConfig({
+  base: "/babycare/",
   define: {
     __COMMIT_HASH__: JSON.stringify(commitHash),
   },
@@ -41,8 +42,8 @@ export default defineConfig({
         background_color: "#ffffff",
         display: "standalone",
         orientation: "portrait",
-        scope: "/",
-        start_url: "/",
+        scope: "/babycare/",
+        start_url: "/babycare/",
         icons: [
           {
             src: "pwa-192x192.png",
