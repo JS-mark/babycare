@@ -87,7 +87,7 @@ export default function Home() {
         <div className="flex flex-col items-center max-w-lg mx-auto px-4">
           <div className="w-20 h-20 mb-3 rounded-full overflow-hidden ring-4 ring-duo-green/20 dark:ring-duo-green/15 animate-float">
             <img
-              src="/mascot.png"
+              src="./mascot.png"
               alt="宝宝助手"
               className="w-full h-full object-cover scale-135"
             />
@@ -109,11 +109,10 @@ export default function Home() {
           </p>
           {/* Due date — featured pill */}
           {daysUntilDue !== null && (
-            <div className={`flex items-center justify-between rounded-2xl px-5 py-3.5 mb-3 ${
-              daysUntilDue <= 0
-                ? 'bg-duo-orange/10 dark:bg-duo-orange/15'
-                : 'bg-duo-purple/10 dark:bg-duo-purple/15'
-            }`}>
+            <div className={`flex items-center justify-between rounded-2xl px-5 py-3.5 mb-3 ${daysUntilDue <= 0
+              ? 'bg-duo-orange/10 dark:bg-duo-orange/15'
+              : 'bg-duo-purple/10 dark:bg-duo-purple/15'
+              }`}>
               <div className="flex items-center gap-2">
                 <span className="text-lg">📅</span>
                 <div>
@@ -232,11 +231,10 @@ export default function Home() {
               <button
                 key={tool.id}
                 onClick={() => tool.available && navigate(tool.path)}
-                className={`rounded-2xl py-5 px-4 min-h-[7.5rem] flex flex-col items-center justify-center text-center transition-all duration-150 ${
-                  tool.available
-                    ? 'bg-white dark:bg-[#16213e] border border-gray-200 dark:border-gray-700/60 active:scale-[0.96]'
-                    : 'bg-gray-50 dark:bg-gray-800/30 border border-dashed border-gray-200 dark:border-gray-700 opacity-40'
-                }`}
+                className={`rounded-2xl py-5 px-4 min-h-[7.5rem] flex flex-col items-center justify-center text-center transition-all duration-150 ${tool.available
+                  ? 'bg-white dark:bg-[#16213e] border border-gray-200 dark:border-gray-700/60 active:scale-[0.96]'
+                  : 'bg-gray-50 dark:bg-gray-800/30 border border-dashed border-gray-200 dark:border-gray-700 opacity-40'
+                  }`}
               >
                 {!tool.available && (
                   <span className="text-[9px] font-semibold text-gray-400 dark:text-gray-500 bg-gray-100 dark:bg-gray-700 px-1.5 py-0.5 rounded-full mb-1">
