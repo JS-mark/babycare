@@ -6,12 +6,14 @@ import { AlertDialog } from '@base-ui/react/alert-dialog'
 import { IconChildHeadOutlineDuo18 } from 'nucleo-ui-outline-duo-18'
 import { IconTimer2OutlineDuo18 } from 'nucleo-ui-outline-duo-18'
 import { IconGlassFillDuo18 } from 'nucleo-ui-fill-duo-18'
+import { IconBabyClothesOutlineDuo18 } from 'nucleo-ui-outline-duo-18'
 import { Liveline } from 'liveline'
 import StickyHeader from '../components/StickyHeader.tsx'
-import { db, type KickSession, type ContractionSession, type Contraction, type FeedingRecord } from '../lib/db.ts'
+import { db, type KickSession, type ContractionSession, type Contraction, type FeedingRecord, type DiaperRecord } from '../lib/db.ts'
 import { getSettings } from '../lib/settings.ts'
 import { formatDate, formatTime, formatDuration, isSameDay } from '../lib/time.ts'
 import { getFeedingLabel, getFeedingEmoji, getFeedingColor, getFeedingBgColor, formatFeedingDuration } from '../lib/feeding-helpers.ts'
+import { getColorOption, getConsistencyLabel } from '../lib/diaper-helpers.ts'
 import { getChartPoints, getContractionChartPoints, getFeedingVolumeChartPoints, getFeedingDurationChartPoints, getTimeline } from './history-helpers.ts'
 
 function formatMs(ms: number): string {
@@ -28,6 +30,7 @@ export default function History() {
   const [contractionSessions, setContractionSessions] = useState<ContractionSession[]>([])
   const [contractions, setContractions] = useState<Record<string, Contraction[]>>({})
   const [feedingRecords, setFeedingRecords] = useState<FeedingRecord[]>([])
+  const [diaperRecords, setDiaperRecords] = useState<DiaperRecord[]>([])
   const [expandedId, setExpandedId] = useState<string | null>(null)
   const [chartRange, setChartRange] = useState<7 | 30>(7)
   const [contractionChartRange, setContractionChartRange] = useState<7 | 30>(7)
@@ -40,6 +43,7 @@ export default function History() {
     db.sessions.orderBy('startedAt').reverse().toArray().then(setKickSessions)
     db.contractionSessions.orderBy('startedAt').reverse().toArray().then(setContractionSessions)
     db.feedingRecords.orderBy('startedAt').reverse().toArray().then(setFeedingRecords)
+    db.diaperRecords.orderBy('createdAt').reverse().toArray().then(setDiaperRecords)
   }, [])
 
   async function loadContractions(sessionId: string) {
@@ -101,6 +105,21 @@ export default function History() {
     [],
   )
 
+  // Diaper records grouped by date
+  const diaperGrouped = diaperRecords.reduce<{ date: string; ts: number; records: DiaperRecord[] }[]>(
+    (acc, record) => {
+      const dateStr = formatDate(record.createdAt)
+      const last = acc[acc.length - 1]
+      if (last && last.date === dateStr) {
+        last.records.push(record)
+      } else {
+        acc.push({ date: dateStr, ts: record.createdAt, records: [record] })
+      }
+      return acc
+    },
+    [],
+  )
+
   // Chart data for kicks (Liveline)
   const settings = getSettings()
   const isDark = document.documentElement.classList.contains('dark')
@@ -118,7 +137,7 @@ export default function History() {
   )
   const todayFeedingValue = feedingChartPoints.length > 0 ? feedingChartPoints[feedingChartPoints.length - 1].value : 0
 
-  const indicatorColor = activeTab === 'contractions' ? 'bg-duo-orange' : activeTab === 'feeding' ? 'bg-duo-purple' : 'bg-duo-green'
+  const indicatorColor = activeTab === 'contractions' ? 'bg-duo-orange' : activeTab === 'feeding' ? 'bg-duo-purple' : activeTab === 'diaper' ? 'bg-duo-orange' : 'bg-duo-green'
 
   return (
     <div className="max-w-lg mx-auto pb-4">
@@ -148,6 +167,12 @@ export default function History() {
             className="flex-1 pb-3 text-sm font-bold uppercase tracking-wider transition-colors text-gray-400 data-[selected]:text-duo-purple outline-none cursor-pointer"
           >
             <IconGlassFillDuo18 size={16} className="inline-block align-[-2px] mr-1" /> 喂奶
+          </Tabs.Tab>
+          <Tabs.Tab
+            value="diaper"
+            className="flex-1 pb-3 text-sm font-bold uppercase tracking-wider transition-colors text-gray-400 data-[selected]:text-duo-orange outline-none cursor-pointer"
+          >
+            <IconBabyClothesOutlineDuo18 size={16} className="inline-block align-[-2px] mr-1" /> 尿布
           </Tabs.Tab>
           <Tabs.Indicator className={`absolute bottom-0 left-[var(--active-tab-left)] h-[3px] w-[var(--active-tab-width)] rounded-full -mb-[1px] transition-all duration-200 ease-out ${indicatorColor}`} />
         </Tabs.List>
@@ -629,6 +654,67 @@ export default function History() {
                           </div>
                         </div>
                       ))}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </>
+          )}
+        </Tabs.Panel>
+
+        {/* Diaper Tab */}
+        <Tabs.Panel value="diaper" className="outline-none">
+          {diaperRecords.length === 0 ? (
+            <div className="text-center py-16">
+              <div className="text-5xl mb-4">📝</div>
+              <p className="text-gray-400 dark:text-gray-500 font-bold">还没有换尿布记录</p>
+              <p className="text-sm text-gray-400 dark:text-gray-600 mt-1">去换尿布工具开始记录吧！</p>
+            </div>
+          ) : (
+            <>
+              <p className="text-[11px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-3">
+                记录列表
+              </p>
+              <div className="space-y-6">
+                {diaperGrouped.map(group => (
+                  <div key={group.date}>
+                    <div className="flex items-center justify-between mb-2">
+                      <h3 className="text-sm font-bold text-gray-800 dark:text-white">
+                        {isSameDay(group.ts, Date.now()) ? '今天' : group.date}
+                      </h3>
+                      <span className="text-xs font-bold text-gray-400 dark:text-gray-500">
+                        共 {group.records.length} 次
+                      </span>
+                    </div>
+                    <div className="bg-white dark:bg-[#16213e] rounded-2xl border border-gray-200 dark:border-gray-700/60 overflow-hidden">
+                      {group.records.map((record, idx) => {
+                        const colorOpt = getColorOption(record.color)
+                        return (
+                          <div key={record.id}>
+                            {idx > 0 && (
+                              <div className="mx-4 border-t border-gray-100 dark:border-gray-700/40" />
+                            )}
+                            <div className="px-4 py-3.5 flex items-center justify-between">
+                              <div className="flex items-center gap-3">
+                                <span className="text-lg">{colorOpt.emoji}</span>
+                                <div>
+                                  <p className="text-sm font-bold text-gray-800 dark:text-white">
+                                    {colorOpt.label} · {getConsistencyLabel(record.consistency)}
+                                  </p>
+                                  <p className="text-xs text-gray-400 mt-0.5">
+                                    {formatTime(record.createdAt)}
+                                  </p>
+                                </div>
+                              </div>
+                              {colorOpt.alert && (
+                                <span className="text-xs font-bold text-duo-red bg-duo-red/10 px-2 py-1 rounded-lg">
+                                  建议就医
+                                </span>
+                              )}
+                            </div>
+                          </div>
+                        )
+                      })}
                     </div>
                   </div>
                 ))}

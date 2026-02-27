@@ -55,12 +55,24 @@ export interface FeedingRecord {
   notes: string | null
 }
 
+export type PoopColor = 'yellow' | 'brown' | 'green' | 'black' | 'red' | 'white'
+export type PoopConsistency = 'watery' | 'soft' | 'hard'
+
+export interface DiaperRecord {
+  id: string
+  color: PoopColor
+  consistency: PoopConsistency
+  notes: string | null
+  createdAt: number
+}
+
 const db = new Dexie('KickCounterDB') as Dexie & {
   sessions: EntityTable<KickSession, 'id'>
   contractionSessions: EntityTable<ContractionSession, 'id'>
   contractions: EntityTable<Contraction, 'id'>
   hospitalBagItems: EntityTable<HospitalBagItem, 'id'>
   feedingRecords: EntityTable<FeedingRecord, 'id'>
+  diaperRecords: EntityTable<DiaperRecord, 'id'>
 }
 
 db.version(1).stores({
@@ -86,6 +98,15 @@ db.version(4).stores({
   contractions: 'id, sessionId, startedAt',
   hospitalBagItems: 'id, category, sortOrder',
   feedingRecords: 'id, type, startedAt',
+})
+
+db.version(5).stores({
+  sessions: 'id, startedAt',
+  contractionSessions: 'id, startedAt',
+  contractions: 'id, sessionId, startedAt',
+  hospitalBagItems: 'id, category, sortOrder',
+  feedingRecords: 'id, type, startedAt',
+  diaperRecords: 'id, createdAt',
 })
 
 export { db }

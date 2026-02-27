@@ -13,6 +13,7 @@ import HospitalBagHome from "./pages/tools/hospital-bag/HospitalBagHome.tsx";
 import FeedingLogHome from "./pages/tools/feeding-log/FeedingLogHome.tsx";
 import FeedingSession from "./pages/tools/feeding-log/FeedingSession.tsx";
 import BottleEntry from "./pages/tools/feeding-log/BottleEntry.tsx";
+import DiaperHome from "./pages/tools/diaper-tracker/DiaperHome.tsx";
 
 export default function App() {
   return (
@@ -31,6 +32,7 @@ export default function App() {
           />
           <Route path="/tools/hospital-bag" element={<HospitalBagHome />} />
           <Route path="/tools/feeding-log" element={<FeedingLogHome />} />
+          <Route path="/tools/diaper-tracker" element={<DiaperHome />} />
         </Route>
         <Route
           path="/tools/kick-counter/session/:sessionId"

@@ -80,12 +80,14 @@ export default function Settings() {
       contractions,
       hospitalBagItems,
       feedingRecords,
+      diaperRecords,
     ] = await Promise.all([
       db.sessions.toArray(),
       db.contractionSessions.toArray(),
       db.contractions.toArray(),
       db.hospitalBagItems.toArray(),
       db.feedingRecords.toArray(),
+      db.diaperRecords.toArray(),
     ]);
     const data = JSON.stringify(
       {
@@ -94,6 +96,7 @@ export default function Settings() {
         contractions,
         hospitalBagItems,
         feedingRecords,
+        diaperRecords,
       },
       null,
       2,
@@ -144,6 +147,10 @@ export default function Settings() {
           await db.feedingRecords.bulkPut(data.feedingRecords);
           count += data.feedingRecords.length;
         }
+        if (data.diaperRecords) {
+          await db.diaperRecords.bulkPut(data.diaperRecords);
+          count += data.diaperRecords.length;
+        }
       }
       sileo.success({
         title: "导入成功",
@@ -160,6 +167,7 @@ export default function Settings() {
       db.contractions.clear(),
       db.hospitalBagItems.clear(),
       db.feedingRecords.clear(),
+      db.diaperRecords.clear(),
     ]);
     sileo.success({ title: "已清除", description: "所有记录已删除" });
   }
