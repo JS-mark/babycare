@@ -12,7 +12,7 @@ import { db, type KickSession, type ContractionSession, type Contraction, type F
 import { getSettings } from '../lib/settings.ts'
 import { formatDate, formatTime, formatDuration, isSameDay } from '../lib/time.ts'
 import { getFeedingLabel, getFeedingEmoji, getFeedingColor, getFeedingBgColor, formatFeedingDuration } from '../lib/feeding-helpers.ts'
-import { getChartPoints, getTimeline } from './history-helpers.ts'
+import { getChartPoints, getContractionChartPoints, getFeedingVolumeChartPoints, getFeedingDurationChartPoints, getTimeline } from './history-helpers.ts'
 
 function formatMs(ms: number): string {
   const s = Math.floor(ms / 1000)
@@ -30,6 +30,9 @@ export default function History() {
   const [feedingRecords, setFeedingRecords] = useState<FeedingRecord[]>([])
   const [expandedId, setExpandedId] = useState<string | null>(null)
   const [chartRange, setChartRange] = useState<7 | 30>(7)
+  const [contractionChartRange, setContractionChartRange] = useState<7 | 30>(7)
+  const [feedingChartRange, setFeedingChartRange] = useState<7 | 30>(7)
+  const [feedingChartMode, setFeedingChartMode] = useState<'volume' | 'duration'>('volume')
   const [activeTab, setActiveTab] = useState<string | null>('kicks')
   const [deletingSessionId, setDeletingSessionId] = useState<string | null>(null)
 
@@ -103,6 +106,17 @@ export default function History() {
   const isDark = document.documentElement.classList.contains('dark')
   const chartPoints = useMemo(() => getChartPoints(kickSessions, chartRange), [kickSessions, chartRange])
   const todayKicks = chartPoints.length > 0 ? chartPoints[chartPoints.length - 1].value : 0
+
+  const contractionChartPoints = useMemo(() => getContractionChartPoints(contractionSessions, contractionChartRange), [contractionSessions, contractionChartRange])
+  const todayInterval = contractionChartPoints.length > 0 ? contractionChartPoints[contractionChartPoints.length - 1].value : 0
+
+  const feedingChartPoints = useMemo(
+    () => feedingChartMode === 'volume'
+      ? getFeedingVolumeChartPoints(feedingRecords, feedingChartRange)
+      : getFeedingDurationChartPoints(feedingRecords, feedingChartRange),
+    [feedingRecords, feedingChartRange, feedingChartMode],
+  )
+  const todayFeedingValue = feedingChartPoints.length > 0 ? feedingChartPoints[feedingChartPoints.length - 1].value : 0
 
   const indicatorColor = activeTab === 'contractions' ? 'bg-duo-orange' : activeTab === 'feeding' ? 'bg-duo-purple' : 'bg-duo-green'
 
@@ -319,6 +333,61 @@ export default function History() {
             </div>
           ) : (
             <>
+              {/* Contraction Interval Trend Chart */}
+              <p className="text-[11px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-3">
+                宫缩间隔趋势
+              </p>
+              <div className="bg-white dark:bg-[#16213e] rounded-2xl p-5 mb-6 border border-gray-200 dark:border-gray-700/60">
+                <div className="flex items-center justify-end mb-3">
+                  <div className="flex gap-1 bg-gray-100 dark:bg-gray-800 rounded-xl p-0.5">
+                    <button
+                      onClick={() => setContractionChartRange(7)}
+                      className={`px-3 py-1 text-xs font-bold rounded-lg transition-colors ${
+                        contractionChartRange === 7
+                          ? 'bg-white dark:bg-gray-700 text-duo-orange'
+                          : 'text-gray-400'
+                      }`}
+                    >
+                      7天
+                    </button>
+                    <button
+                      onClick={() => setContractionChartRange(30)}
+                      className={`px-3 py-1 text-xs font-bold rounded-lg transition-colors ${
+                        contractionChartRange === 30
+                          ? 'bg-white dark:bg-gray-700 text-duo-orange'
+                          : 'text-gray-400'
+                      }`}
+                    >
+                      30天
+                    </button>
+                  </div>
+                </div>
+                <div className="h-40">
+                  <Liveline
+                    data={contractionChartPoints}
+                    value={todayInterval}
+                    color="#FF9600"
+                    theme={isDark ? 'dark' : 'light'}
+                    referenceLine={{ value: 5, label: '5-1-1 警戒线' }}
+                    formatValue={(v) => v > 0 ? v.toFixed(1) + ' 分钟' : '无数据'}
+                    formatTime={(t) => {
+                      const d = new Date(t * 1000)
+                      return contractionChartRange <= 7
+                        ? ['周日', '周一', '周二', '周三', '周四', '周五', '周六'][d.getDay()]
+                        : `${d.getMonth() + 1}/${d.getDate()}`
+                    }}
+                    window={contractionChartRange * 86400}
+                    grid
+                    fill
+                    scrub
+                    exaggerate
+                    momentum={false}
+                    badge={false}
+                    pulse={false}
+                  />
+                </div>
+              </div>
+
               <p className="text-[11px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-3">
                 记录列表
               </p>
@@ -429,6 +498,85 @@ export default function History() {
             </div>
           ) : (
             <>
+              {/* Feeding Trend Chart */}
+              <p className="text-[11px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-3">
+                喂奶趋势
+              </p>
+              <div className="bg-white dark:bg-[#16213e] rounded-2xl p-5 mb-6 border border-gray-200 dark:border-gray-700/60">
+                <div className="flex items-center justify-between mb-3">
+                  <div className="flex gap-1 bg-gray-100 dark:bg-gray-800 rounded-xl p-0.5">
+                    <button
+                      onClick={() => setFeedingChartMode('volume')}
+                      className={`px-3 py-1 text-xs font-bold rounded-lg transition-colors ${
+                        feedingChartMode === 'volume'
+                          ? 'bg-white dark:bg-gray-700 text-duo-purple'
+                          : 'text-gray-400'
+                      }`}
+                    >
+                      奶量
+                    </button>
+                    <button
+                      onClick={() => setFeedingChartMode('duration')}
+                      className={`px-3 py-1 text-xs font-bold rounded-lg transition-colors ${
+                        feedingChartMode === 'duration'
+                          ? 'bg-white dark:bg-gray-700 text-duo-purple'
+                          : 'text-gray-400'
+                      }`}
+                    >
+                      时长
+                    </button>
+                  </div>
+                  <div className="flex gap-1 bg-gray-100 dark:bg-gray-800 rounded-xl p-0.5">
+                    <button
+                      onClick={() => setFeedingChartRange(7)}
+                      className={`px-3 py-1 text-xs font-bold rounded-lg transition-colors ${
+                        feedingChartRange === 7
+                          ? 'bg-white dark:bg-gray-700 text-duo-purple'
+                          : 'text-gray-400'
+                      }`}
+                    >
+                      7天
+                    </button>
+                    <button
+                      onClick={() => setFeedingChartRange(30)}
+                      className={`px-3 py-1 text-xs font-bold rounded-lg transition-colors ${
+                        feedingChartRange === 30
+                          ? 'bg-white dark:bg-gray-700 text-duo-purple'
+                          : 'text-gray-400'
+                      }`}
+                    >
+                      30天
+                    </button>
+                  </div>
+                </div>
+                <div className="h-40">
+                  <Liveline
+                    data={feedingChartPoints}
+                    value={todayFeedingValue}
+                    color="#CE82FF"
+                    theme={isDark ? 'dark' : 'light'}
+                    formatValue={(v) => feedingChartMode === 'volume'
+                      ? (v > 0 ? Math.round(v) + ' ml' : '无数据')
+                      : (v > 0 ? v.toFixed(0) + ' 分钟' : '无数据')
+                    }
+                    formatTime={(t) => {
+                      const d = new Date(t * 1000)
+                      return feedingChartRange <= 7
+                        ? ['周日', '周一', '周二', '周三', '周四', '周五', '周六'][d.getDay()]
+                        : `${d.getMonth() + 1}/${d.getDate()}`
+                    }}
+                    window={feedingChartRange * 86400}
+                    grid
+                    fill
+                    scrub
+                    exaggerate
+                    momentum={false}
+                    badge={false}
+                    pulse={false}
+                  />
+                </div>
+              </div>
+
               <p className="text-[11px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-3">
                 记录列表
               </p>

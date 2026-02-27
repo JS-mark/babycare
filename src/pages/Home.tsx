@@ -1,12 +1,14 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { IconChildHeadOutlineDuo18 } from 'nucleo-ui-outline-duo-18'
 import { IconGlassFillDuo18 } from 'nucleo-ui-fill-duo-18'
+import { Liveline } from 'liveline'
 import { db, type KickSession, type FeedingRecord } from '../lib/db.ts'
-import { getDaysUntilDue, getWeeksPregnant } from '../lib/settings.ts'
+import { getDaysUntilDue, getWeeksPregnant, getSettings } from '../lib/settings.ts'
 import { isSameDay } from '../lib/time.ts'
 import { formatTimeSinceLastFeed } from '../lib/feeding-helpers.ts'
 import { getOrderedTools } from '../lib/tools.tsx'
+import { getChartPoints } from './history-helpers.ts'
 
 function getGreeting(): string {
   const hour = new Date().getHours()
@@ -26,6 +28,7 @@ function formatDueDate(days: number): string {
 
 export default function Home() {
   const navigate = useNavigate()
+  const [kickSessions, setKickSessions] = useState<KickSession[]>([])
   const [todayKicks, setTodayKicks] = useState(0)
   const [streak, setStreak] = useState(0)
   const [lastFeedAt, setLastFeedAt] = useState<number | null>(null)
@@ -41,6 +44,7 @@ export default function Home() {
 
   async function loadData() {
     const sessions: KickSession[] = await db.sessions.orderBy('startedAt').reverse().toArray()
+    setKickSessions(sessions)
     const today = sessions.filter(s => isSameDay(s.startedAt, Date.now()))
     setTodayKicks(today.reduce((sum, s) => sum + s.kickCount, 0))
     setActiveKickSession(sessions.find(s => s.endedAt === null) ?? null)
@@ -65,6 +69,10 @@ export default function Home() {
       setLastFeedAt(feeds[0].startedAt)
     }
   }
+
+  const settings = getSettings()
+  const isDark = document.documentElement.classList.contains('dark')
+  const weeklyChartPoints = useMemo(() => getChartPoints(kickSessions, 7), [kickSessions])
 
   return (
     <div className="pb-4">
@@ -137,6 +145,43 @@ export default function Home() {
               </div>
             )}
           </div>
+
+          {/* Mini Weekly Kick Sparkline */}
+          {kickSessions.length > 0 && (
+            <div className="mt-3 bg-white dark:bg-[#16213e] rounded-2xl border border-gray-200 dark:border-gray-700/60 px-4 py-3">
+              <div className="flex items-center justify-between mb-2">
+                <p className="text-xs font-bold text-gray-500 dark:text-gray-400">本周胎动</p>
+                <button
+                  onClick={() => navigate('/history')}
+                  className="text-[10px] font-bold text-duo-green"
+                >
+                  查看详情 →
+                </button>
+              </div>
+              <div className="h-16">
+                <Liveline
+                  data={weeklyChartPoints}
+                  value={todayKicks}
+                  color="#58CC02"
+                  theme={isDark ? 'dark' : 'light'}
+                  referenceLine={{ value: settings.goalCount, label: '目标' }}
+                  formatValue={(v) => Math.round(v) + ' 次'}
+                  formatTime={(t) => {
+                    const d = new Date(t * 1000)
+                    return ['日', '一', '二', '三', '四', '五', '六'][d.getDay()]
+                  }}
+                  window={7 * 86400}
+                  grid={false}
+                  fill
+                  scrub={false}
+                  exaggerate
+                  momentum={false}
+                  badge={false}
+                  pulse={false}
+                />
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Active Kick Session Banner */}
