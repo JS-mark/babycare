@@ -391,7 +391,7 @@ export default function Settings() {
                     确认清除数据？
                   </AlertDialog.Title>
                   <AlertDialog.Description className="text-sm text-gray-500 dark:text-gray-400 mb-6">
-                    此操作将删除所有胎动、宫缩、喂奶和待产包记录，且无法恢复。
+                    此操作将删除所有胎动、宫缩、喂奶、换尿布和待产包记录，且无法恢复。
                   </AlertDialog.Description>
                   <div className="flex gap-3">
                     <AlertDialog.Close className="flex-1 py-3 bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 font-bold text-sm rounded-xl transition-colors cursor-pointer">
