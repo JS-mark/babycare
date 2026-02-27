@@ -34,12 +34,12 @@
 - [x] 历史记录（History 第三 tab，按日分组）
 - [x] 数据导出/导入/清除支持
 
-## Phase 3.5: Liveline Charts (In Progress)
+## Phase 3.5: Liveline Charts ✅ COMPLETE
 - [x] History — Kick trend chart (daily totals, 7/30-day toggle, reference line)
 - [x] KickSession — Live kick timeline (real-time cumulative chart during session)
-- [ ] History — Contraction interval trend chart
-- [ ] Feeding log — Volume/duration trend chart
-- [ ] Home page — Mini weekly kick sparkline
+- [x] History — Contraction interval trend chart (daily avg interval, 5-1-1 reference line)
+- [x] Feeding log — Volume/duration trend chart (toggle between ml and minutes)
+- [x] Home page — Mini weekly kick sparkline
 
 ## Phase 4: 换尿布 + 睡眠记录
 - [ ] 换尿布：便便类型/颜色快速选择
