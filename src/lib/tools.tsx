@@ -2,6 +2,7 @@ import type { ReactNode } from 'react'
 import { IconChildHeadOutlineDuo18 } from 'nucleo-ui-outline-duo-18'
 import { IconTimer2OutlineDuo18 } from 'nucleo-ui-outline-duo-18'
 import { IconBagCheckOutlineDuo18 } from 'nucleo-ui-outline-duo-18'
+import { IconBabyClothesOutlineDuo18 } from 'nucleo-ui-outline-duo-18'
 import { IconGlassFillDuo18 } from 'nucleo-ui-fill-duo-18'
 import { getDaysUntilDue, getWeeksPregnant } from './settings.ts'
 
@@ -40,6 +41,13 @@ export const allTools: ToolCard[] = [
     title: '喂奶记录',
     icon: <IconGlassFillDuo18 size={32} className="text-duo-purple" />,
     path: '/tools/feeding-log',
+    available: true,
+  },
+  {
+    id: 'diaper-tracker',
+    title: '换尿布',
+    icon: <IconBabyClothesOutlineDuo18 size={32} className="text-duo-orange" />,
+    path: '/tools/diaper-tracker',
     available: true,
   },
 ]

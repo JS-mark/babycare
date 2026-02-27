@@ -1,6 +1,7 @@
 import { useEffect, useState, useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { IconChildHeadOutlineDuo18 } from 'nucleo-ui-outline-duo-18'
+import { IconBabyClothesOutlineDuo18 } from 'nucleo-ui-outline-duo-18'
 import { IconGlassFillDuo18 } from 'nucleo-ui-fill-duo-18'
 import { Liveline } from 'liveline'
 import { db, type KickSession, type FeedingRecord } from '../lib/db.ts'
@@ -32,6 +33,7 @@ export default function Home() {
   const [todayKicks, setTodayKicks] = useState(0)
   const [streak, setStreak] = useState(0)
   const [lastFeedAt, setLastFeedAt] = useState<number | null>(null)
+  const [todayDiapers, setTodayDiapers] = useState(0)
   const [activeKickSession, setActiveKickSession] = useState<KickSession | null>(null)
   const daysUntilDue = getDaysUntilDue()
   const weeksPregnant = getWeeksPregnant()
@@ -68,6 +70,10 @@ export default function Home() {
     if (feeds.length > 0) {
       setLastFeedAt(feeds[0].startedAt)
     }
+
+    // Load today's diaper count
+    const allDiapers = await db.diaperRecords.orderBy('createdAt').reverse().toArray()
+    setTodayDiapers(allDiapers.filter(r => isSameDay(r.createdAt, Date.now())).length)
   }
 
   const settings = getSettings()
@@ -142,6 +148,13 @@ export default function Home() {
                 <IconGlassFillDuo18 size={15} className="text-duo-purple" />
                 <span className="text-sm font-extrabold text-duo-purple">{formatTimeSinceLastFeed(lastFeedAt)}</span>
                 <span className="text-xs font-bold text-gray-500 dark:text-gray-400">距上次喂奶</span>
+              </div>
+            )}
+            {todayDiapers > 0 && (
+              <div className="flex items-center gap-1.5 bg-duo-orange/10 dark:bg-duo-orange/15 rounded-full px-3.5 py-2">
+                <IconBabyClothesOutlineDuo18 size={15} className="text-duo-orange" />
+                <span className="text-sm font-extrabold text-duo-orange">{todayDiapers}</span>
+                <span className="text-xs font-bold text-gray-500 dark:text-gray-400">今日换尿布</span>
               </div>
             )}
           </div>
