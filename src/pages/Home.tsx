@@ -87,7 +87,7 @@ export default function Home() {
         <div className="flex flex-col items-center max-w-lg mx-auto px-4">
           <div className="w-20 h-20 mb-3 rounded-full overflow-hidden ring-4 ring-duo-green/20 dark:ring-duo-green/15 animate-float">
             <img
-              src="/babycare/mascot.png"
+              src={`${import.meta.env.BASE_URL}mascot.png`}
               alt="宝宝助手"
               className="w-full h-full object-cover scale-135"
             />
