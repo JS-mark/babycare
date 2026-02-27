@@ -73,22 +73,22 @@ Duolingo-inspired, flat, clean, and playful. Defined in `src/index.css` and appl
 
 #### Color Palette (`src/index.css`)
 
-| Token              | Hex       | Usage                                   |
-|--------------------|-----------|------------------------------------------|
-| `duo-green`        | `#58CC02` | Primary actions, kick counter, active toggle states |
-| `duo-green-dark`   | `#46a302` | Button bottom borders (pressed look)     |
-| `duo-orange`       | `#FF9600` | Streaks, contraction timer, warnings     |
-| `duo-blue`         | `#1CB0F6` | Kick counter icon, informational accents |
-| `duo-purple`       | `#CE82FF` | Due date, date picker accent             |
-| `duo-red`          | `#FF4B4B` | Danger actions, stop buttons, alerts     |
-| `duo-yellow`       | `#FFC800` | Celebrations, highlights                 |
-| `duo-gray`         | `#E5E5E5` | Disabled states, separators              |
+| Token            | Hex       | Usage                                               |
+|------------------|-----------|-----------------------------------------------------|
+| `duo-green`      | `#58CC02` | Primary actions, kick counter, active toggle states |
+| `duo-green-dark` | `#46a302` | Button bottom borders (pressed look)                |
+| `duo-orange`     | `#FF9600` | Streaks, contraction timer, warnings                |
+| `duo-blue`       | `#1CB0F6` | Kick counter icon, informational accents            |
+| `duo-purple`     | `#CE82FF` | Due date, date picker accent                        |
+| `duo-red`        | `#FF4B4B` | Danger actions, stop buttons, alerts                |
+| `duo-yellow`     | `#FFC800` | Celebrations, highlights                            |
+| `duo-gray`       | `#E5E5E5` | Disabled states, separators                         |
 
 #### CSS Variables (`src/index.css`)
 
-| Variable | Light | Dark | Usage |
-|----------|-------|------|-------|
-| `--sileo-fill` | `#f3f3f3` | `#161616` | Toast notification SVG fill |
+| Variable          | Light     | Dark      | Usage                             |
+|-------------------|-----------|-----------|-----------------------------------|
+| `--sileo-fill`    | `#f3f3f3` | `#161616` | Toast notification SVG fill       |
 | `--dock-accent-1` | `#1a1a1a` | `#ffffff` | Nucleo glass icon gradient stop 1 |
 | `--dock-accent-2` | `#404040` | `#d4d4d4` | Nucleo glass icon gradient stop 2 |
 
@@ -103,6 +103,7 @@ Duolingo-inspired, flat, clean, and playful. Defined in `src/index.css` and appl
 #### Section Headers
 
 Uppercase, tiny, bold, gray:
+
 ```
 <p class="text-[11px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-3">
   SECTION NAME
@@ -112,6 +113,7 @@ Uppercase, tiny, bold, gray:
 #### Bottom Sheet Dialog
 
 For pickers, tool picker, and confirmations that slide up from bottom:
+
 ```tsx
 <Dialog.Popup className="fixed bottom-0 left-0 right-0 bg-white dark:bg-[#16213e] rounded-t-3xl px-5 pt-5 pb-8 transition-all duration-300 data-[ending-style]:translate-y-full data-[starting-style]:translate-y-full">
   <div className="w-10 h-1 bg-gray-300 dark:bg-gray-600 rounded-full mx-auto mb-5" />
@@ -121,14 +123,14 @@ For pickers, tool picker, and confirmations that slide up from bottom:
 
 #### Dark Mode Tokens
 
-| Element      | Light               | Dark                   |
-|-------------|----------------------|------------------------|
-| Page bg     | `bg-gray-50`         | `bg-[#1a1a2e]`        |
-| Card bg     | `bg-white`           | `bg-[#16213e]`        |
-| Card border | `border-gray-200`    | `border-gray-700/60`  |
-| Text primary| `text-gray-800`      | `text-white`           |
-| Text muted  | `text-gray-400`      | `text-gray-500`        |
-| Input bg    | `bg-gray-100`        | `bg-gray-800`          |
+| Element      | Light             | Dark                 |
+|--------------|-------------------|----------------------|
+| Page bg      | `bg-gray-50`      | `bg-[#1a1a2e]`       |
+| Card bg      | `bg-white`        | `bg-[#16213e]`       |
+| Card border  | `border-gray-200` | `border-gray-700/60` |
+| Text primary | `text-gray-800`   | `text-white`         |
+| Text muted   | `text-gray-400`   | `text-gray-500`      |
+| Input bg     | `bg-gray-100`     | `bg-gray-800`        |
 
 ### Dock (`src/components/Dock.tsx`)
 
